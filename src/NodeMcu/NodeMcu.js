@@ -46,6 +46,31 @@ const enrollFingerprintEntry = async (token, userID) => {
 
 };
 
+const validateDeviceToken = async(deviceToken) => {
+    try {
+      const result = await axios.get(SERVER.API_HOST+"/api/device/deviceExist/"+deviceToken);
+      //console.log(result.data);
+      return result.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+const getDeviceInfo = async (token) => {
+    try {
+      const response = await axios.get(SERVER.API_HOST+"/api/serviceIO/getDeviceInfo/" + token);
+
+      return response.data;
+      /* if (response.status == 200) {
+        return response.data;
+      } */
+      console.log(response.data);
+      //return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
 
 const getUserSocket = async (token) => {
@@ -105,5 +130,5 @@ const changeState = async (token, state) => {
 
 
 
-module.exports = {sendIdSocket, enrollFingerprintEntry, enrollUser, changeState, getUserSocket};
+module.exports = {sendIdSocket, enrollFingerprintEntry, enrollUser, changeState, getUserSocket, getDeviceInfo, validateDeviceToken};
 

@@ -14,7 +14,7 @@ const socket = io({
   //To send variable within url
   //http://localhost:3000/?type=1&token=1
   const token = "b24d5cdabbcd8ea189cd8e44a067a4c300f026bf6db059620b020e01fa67";
-  const socket = io('http://localhost:3000', {
+  const socket = io('http://localhost:3010', {
     extraHeaders: {
         "token": token,
         "type": "1"

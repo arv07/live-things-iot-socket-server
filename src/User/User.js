@@ -1,6 +1,7 @@
 const axios = require("axios");
 const SERVER = require('../utils/constants')
 const Device = require('../NodeMcu/NodeMcu');
+const { response } = require("express");
 
 
 
@@ -17,6 +18,36 @@ const sendIdSocket = async (id_socket, token) => {
     console.error(err);
   }
 };
+
+const validateUserToken = async(userToken) => {
+  try {
+    const result = await axios.get(SERVER.API_HOST+"/api/user/userExist/"+userToken);
+    //console.log(result.data);
+    return result.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getUserToken = async(deviceToken) => {
+  try {
+    const result = await axios.get(SERVER.API_HOST+"/api/user/getTokenUser/"+deviceToken);
+    //console.log(result.data);
+    return result.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getSocketRoom = async(userToken) => {
+  try {
+    const result = await axios.get(SERVER.API_HOST+"/api/user/getSocketRoom/"+userToken);
+    //console.log(result.data);
+    return result.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 
 
@@ -41,4 +72,4 @@ const testSocket = (socket) => {
 
 }
 
-module.exports = { sendIdSocket, testSocket, getDeviceSocket };
+module.exports = { sendIdSocket, testSocket, getDeviceSocket, validateUserToken, getSocketRoom, getUserToken };

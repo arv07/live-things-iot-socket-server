@@ -21,7 +21,7 @@ const sendIdSocket = async (id_socket, token) => {
 
 };
 
-
+///device/fingerpintUser/create
 const enrollFingerprintEntry = async (token, userID) => {
     try{
         
@@ -30,8 +30,8 @@ const enrollFingerprintEntry = async (token, userID) => {
             fingerprint_code: userID
         });
         //console.log("Response:" + res.data);
-        console.log(response.data);
-        console.log(response.status);
+        //console.log(response.data);
+        //console.log(response.status);
 
         if(response.status == 201 || response.status == 200)
         {
@@ -92,7 +92,10 @@ const getUserSocket = async (token) => {
 const enrollUser = async (token, userID) => {
     try{
         
-        const response = await axios.get(SERVER.API_HOST+'/api/nodemcu/rfid/enroll_card/'+token+'/'+userID)
+        const response = await axios.post(SERVER.API_HOST+'/api/device/fingerpintUser/create', {
+          userID: userID,
+          token: token
+        })
         console.log(response);
         return response.data;
         //return res.then(res.data);
@@ -104,6 +107,9 @@ const enrollUser = async (token, userID) => {
     }
 
 };
+
+
+
 
 
 const changeState = async (token, state) => {

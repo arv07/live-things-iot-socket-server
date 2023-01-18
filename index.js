@@ -1,6 +1,7 @@
 /*----------------Import Modules-------------------*/
 const NodeMcu = require("./src/NodeMcu/NodeMcu");
 const DeviceSocket = require("./src/NodeMcu/DeviceSocketListener");
+const DRL1Socket = require("./src/devices/DRL1/DRL1SocketListener")
 const User = require("./src/User/User");
 const UserSocket = require("./src/User/UserSocketListener");
 
@@ -38,7 +39,7 @@ const SocketIO = require("socket.io");
 //SocketIO.listen(server);
 const io = SocketIO(server, {
   cors: {
-    //origin: "http://localhost:3000",
+    //origin: "http://sk.iotappt.win",
     origin: "http://localhost:3000",
   },
 });
@@ -103,7 +104,7 @@ io.on("connection", async (socket) => {
 
     const roomUserId = await User.getSocketRoom(tokenUser);
     socket.join(roomUserId.room_id);
-    console.log(roomUserId);
+    //console.log(roomUserId);
   } else {
     devices = [];
     //Send NodeMcu socket id to laravel
@@ -115,8 +116,8 @@ io.on("connection", async (socket) => {
 
     const deviceInfo = await NodeMcu.getDeviceInfo(tokenDevice);
     //console.log(deviceInfo);
-    console.log("Device connection");
-    console.log(roomUserId);
+    //console.log("Device connection");
+    //console.log(roomUserId);
     devices.push(deviceInfo)
     io.to(roomUserId.room_id).emit("DEVICE:newConnection", {
       devices: devices
@@ -130,6 +131,7 @@ io.on("connection", async (socket) => {
   DeviceSocket.startSocketListener(socket, io);
 
   UserSocket.startSocketListener(socket, io);
+  DRL1Socket.startSocketListener(socket, io);
 
   /* socket.on("USER:getSensorMode", (data) => {
         console.log(data);
@@ -140,7 +142,7 @@ io.on("connection", async (socket) => {
 
     const roomUserId = await User.getSocketRoom(data.tokenUser);
     const socketInstances = await io.in(roomUserId.room_id).fetchSockets();
-    console.log("Ejecutando getConnection....");
+    //console.log("Ejecutando getConnection....");
     let users = [];
     let devices = [];
     let connectedUsers = [
@@ -169,13 +171,13 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("disconnect", async () => {
-    console.log("disconnect ID: " + socket.id);
+    //console.log("disconnect ID: " + socket.id);
     const socketInstance = await io.in(socket.id).fetchSockets();
 
   });
 
   socket.on("disconnecting", async () => {
-    console.log("Usuario: " + socket.id + "se desconecto de la sala: "); // the Set contains at least the socket ID
+    //console.log("Usuario: " + socket.id + "se desconecto de la sala: "); // the Set contains at least the socket ID
     const socketInstance = await io.in(socket.id).fetchSockets();
     //console.log(socket);
     let devices = [];

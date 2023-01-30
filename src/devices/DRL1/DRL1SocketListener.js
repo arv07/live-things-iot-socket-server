@@ -5,19 +5,21 @@ const NodeMcu = require("../../NodeMcu/NodeMcu");
 const startSocketListener = (socket, io) => {
 
     socket.on("USER:changeStateDRL1", async (data) => {
-        const response = await User.getDeviceSocket(data.tokenUser);
+        //console.log(data);
+        const response = await User.getDeviceSocket(data.tokenUser, data.idDevice);
+        //console.log(response);
         //console.log(response);
         //console.log(data);
-        const deviceSocket = response.filter(d => {
+        /* const deviceSocket = response.filter(d => {
             if(d.id_device_by_user == data.idDeviceByUser)
             {
                 return d;
             }
-        });
+        }); */
 
         //console.log(deviceSocket);
 
-        io.to(deviceSocket[0].id_socket).emit("DEVICE:changeStateDRL1", {
+        io.to(response.id_socket).emit("DEVICE:changeStateDRL1", {
             response: data.state
         })
     })
@@ -33,12 +35,13 @@ const startSocketListener = (socket, io) => {
     })
 
     socket.on("DEVICE:confirmChangeStateDRL1", async (data) => {
-        const result = await NodeMcu.getUserSocket(data.token);
+        console.log(data);
+        /* const result = await NodeMcu.getUserSocket(data.token);
 
         io.to(result.id_socket).emit("DEVICE:confirmChangeStateDRL1_r", {
             response: data.message
         })
-        console.log(result);
+        console.log(result); */
     });
 
 

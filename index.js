@@ -46,20 +46,20 @@ const io = SocketIO(server, {
 
 /*Check authentication*/
 io.use(async (socket, next) => {
-  const tokenDevice = socket.handshake.headers.token;
-  const tokenUser = socket.handshake.auth.token;
+  const deviceToken = socket.handshake.headers.token;
+  const userToken = socket.handshake.auth.token;
   const type = socket.handshake.headers.type;
   /* console.log(type);
-  console.log(tokenUser);
-  console.log(tokenDevice); */
+  console.log(userToken);
+  console.log(deviceToken); */
   //console.log(socket.handshake.headers);
 
   if (type == 1) {
-    const result = await User.validateUserToken(tokenUser);
+    const result = await User.validateUserToken(userToken);
 
     //console.log(result);
 
-    if (result.validate) {
+    if (result.data) {
       socket.type = 1;
       socket.username = socket.handshake.auth.userName;
       next();
@@ -67,14 +67,14 @@ io.use(async (socket, next) => {
       return next(new Error("Invalid credentials"));
     }
   } else {
-    const result = await NodeMcu.validateDeviceToken(tokenDevice);
+    const result = await NodeMcu.getDevice(deviceToken);
     //console.log("Validación device: " + result.validate);
     //console.log(result);
-    if (result.validate) {
-      const result = await NodeMcu.getDeviceInfo(tokenDevice);
-      //console.log(result);
+    if (result.data != null) {
+      //const result = await NodeMcu.getDevice(deviceToken);
+      console.log(result.data.id_device);
       socket.type = 2;
-      socket.idDeviceByUser = result.id_device_by_user;
+      socket.idDevice = result.data.id_device;
       next();
     } else {
       return next(new Error("Invalid credentials"));
@@ -87,11 +87,11 @@ io.on("connection", async (socket) => {
   console.log("new connection", socket.id);
 
   //To receive parameter in the connection
-  let tokenDevice = socket.handshake.headers.token;
-  let tokenUser = socket.handshake.auth.token;
+  let deviceToken = socket.handshake.headers.token;
+  let userToken = socket.handshake.auth.token;
   let type = socket.handshake.headers.type;
   //console.log("Este es auth: " + socket.handshake.auth.token);
-  //console.log("Token Device: "+ tokenDevice);
+  //console.log("Token Device: "+ deviceToken);
   //console.log("Type Device--: "+ type);
   //console.log(socket);
   //console.log(type);
@@ -100,27 +100,29 @@ io.on("connection", async (socket) => {
   if (type == 1) {
     //Send User socket id to laravel
     //console.log(socket);
-    User.sendIdSocket(socket.id, tokenUser);
+    User.saveIdSocket(socket.id, userToken);
 
-    const roomUserId = await User.getSocketRoom(tokenUser);
-    socket.join(roomUserId.room_id);
+    const roomUserId = await User.getSocketRoom(userToken);
+    socket.join(roomUserId.data);
     //console.log(roomUserId);
   } else {
     devices = [];
     //Send NodeMcu socket id to laravel
-    NodeMcu.sendIdSocket(socket.id, tokenDevice);
-    const tokenUser = await User.getUserToken(tokenDevice);
-    //console.log(tokenUser);
-    const roomUserId = await User.getSocketRoom(tokenUser.token);
-    socket.join(roomUserId.room_id);
+    //console.log(deviceToken);
+    NodeMcu.saveIdSocket(socket.id, deviceToken);
+    const userToken = await User.getUserToken(deviceToken);
+    //console.log(userToken);
+    const roomUserId = await User.getSocketRoom(userToken.data);
+    socket.join(roomUserId.data);
 
-    const deviceInfo = await NodeMcu.getDeviceInfo(tokenDevice);
+    const deviceInfo = await NodeMcu.getDevice(deviceToken);
     //console.log(deviceInfo);
     //console.log("Device connection");
     //console.log(roomUserId);
-    devices.push(deviceInfo)
-    io.to(roomUserId.room_id).emit("DEVICE:newConnection", {
-      devices: devices
+    //devices.push(deviceInfo.data)
+    //console.log(deviceInfo.data);
+    io.to(roomUserId.data).emit("DEVICE:newConnection", {
+      device: deviceInfo.data
     });
   }
   /* console.log('Token:' + token);
@@ -139,9 +141,10 @@ io.on("connection", async (socket) => {
   //User.testSocket(socket);
 
   socket.on("USER:getUsersConnected", async (data) => {
-
-    const roomUserId = await User.getSocketRoom(data.tokenUser);
-    const socketInstances = await io.in(roomUserId.room_id).fetchSockets();
+    console.log("evento get Users");
+    const roomUserId = await User.getSocketRoom(data.userToken);
+    //console.log(roomUserId);
+    const socketInstances = await io.in(roomUserId.data).fetchSockets();
     //console.log("Ejecutando getConnection....");
     let users = [];
     let devices = [];
@@ -151,18 +154,21 @@ io.on("connection", async (socket) => {
 
     for(const sk of socketInstances)
     {
+      //console.log(sk);
       if(sk.type == 1)//Users
       {
         users.push({"name":sk.username});
       }
       else{
-        devices.push({"id_device_by_user":sk.idDeviceByUser});
+        //console.log(sk);
+        devices.push({"id_device":sk.idDevice});
       }
     }
 
     connectedUsers.push({users, devices});
+    //console.log(devices);
 
-    io.to(roomUserId.room_id).emit("USER:getUsersConnected_r", {
+    io.to(roomUserId.data).emit("USER:getUsersConnected_r", {
       //conectados: connectedUsers,
       connected: {users, devices}
       
@@ -184,7 +190,7 @@ io.on("connection", async (socket) => {
 
     if(socket.type == 2)
     {
-      devices.push({"id_device_by_user":socket.idDeviceByUser});
+      devices.push({"id_device_by_user":socket.idDevice});
     }
     
     const arr = Array.from(socket.adapter.rooms);

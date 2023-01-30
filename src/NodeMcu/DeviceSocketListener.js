@@ -1,13 +1,12 @@
 const NodeMcu = require("./NodeMcu");
 
 
-const startSocketListener = (socket, io) => {
 
-    
+const startSocketListener = (socket, io) => {
 
     socket.on('DEVICE:enrollFingerprintEntry', async (data) => {
         //console.log(data);
-        const result = await NodeMcu.getDeviceInfo(data.token);
+        const result = await NodeMcu.getDevice(data.token);
         const deviceSocketId = result.id_socket;
         const response  = await NodeMcu.enrollFingerprintEntry(data.token, data.userID);
         //console.log(result);

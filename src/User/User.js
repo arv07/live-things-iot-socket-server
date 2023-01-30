@@ -5,11 +5,11 @@ const { response } = require("express");
 
 
 
-const sendIdSocket = async (id_socket, token) => {
+const saveIdSocket = async (id_socket, token) => {
   try {
-    const res = await axios.post(SERVER.API_HOST+"/api/user/newConnectionSocket/", {
+    const res = await axios.post(SERVER.API_HOST+"/api/user/socket", {
       id_socket: id_socket,
-      token: token
+      user_token: token
     });
     //console.log(res);
     //console.log("method:" + res.data);
@@ -21,7 +21,7 @@ const sendIdSocket = async (id_socket, token) => {
 
 const validateUserToken = async(userToken) => {
   try {
-    const result = await axios.get(SERVER.API_HOST+"/api/user/userExist/"+userToken);
+    const result = await axios.get(SERVER.API_HOST+"/api/user/validateUserToken/"+userToken);
     //console.log(result.data);
     return result.data;
   } catch (error) {
@@ -31,7 +31,7 @@ const validateUserToken = async(userToken) => {
 
 const getUserToken = async(deviceToken) => {
   try {
-    const result = await axios.get(SERVER.API_HOST+"/api/user/getTokenUser/"+deviceToken);
+    const result = await axios.get(SERVER.API_HOST+"/api/user/getUserToken/"+deviceToken);
     //console.log(result.data);
     return result.data;
   } catch (error) {
@@ -41,7 +41,7 @@ const getUserToken = async(deviceToken) => {
 
 const getSocketRoom = async(userToken) => {
   try {
-    const result = await axios.get(SERVER.API_HOST+"/api/user/getSocketRoom/"+userToken);
+    const result = await axios.get(SERVER.API_HOST+"/api/user/socket/socketRoom/"+userToken);
     //console.log(result.data);
     return result.data;
   } catch (error) {
@@ -52,12 +52,13 @@ const getSocketRoom = async(userToken) => {
 
 
 
-const getDeviceSocket = async (userToken) => {
+const getDeviceSocket = async (userToken, idDevice) => {
   try {
 
-    const response = await axios.get(SERVER.API_HOST+"/api/serviceIO/getIdSocketDevice/"+userToken);
+    const response = await axios.get(SERVER.API_HOST+"/api/socketio/user/device/"+userToken+"/"+idDevice);
     //console.log(response.data);
     return response.data;
+    
     
   } catch (error) {
     console.log(error);
@@ -72,4 +73,4 @@ const testSocket = (socket) => {
 
 }
 
-module.exports = { sendIdSocket, testSocket, getDeviceSocket, validateUserToken, getSocketRoom, getUserToken };
+module.exports = { saveIdSocket, testSocket, getDeviceSocket, validateUserToken, getSocketRoom, getUserToken };

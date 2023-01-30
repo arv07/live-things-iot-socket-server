@@ -3,14 +3,15 @@ const SERVER = require('../utils/constants')
 
 
 
-const sendIdSocket = async (id_socket, token) => {
+const saveIdSocket = async (id_socket, deviceToken) => {
     try{
         
         //console.log(SERVER.API_HOST+'/api/nodemcu/new_connection/'+token+'/'+id_socket);
-        const res = await axios.post(SERVER.API_HOST+"/api/device/newConnectionSocket", {
+        const result = await axios.post(SERVER.API_HOST+"/api/socketio/device/saveIdSocket", {
             id_socket: id_socket,
-            token: token
+            device_token: deviceToken
         });
+        //console.log(result.data);
         /* console.log(token);
         console.log(res.data); */
         
@@ -57,9 +58,9 @@ const validateDeviceToken = async(deviceToken) => {
   }
 
 
-const getDeviceInfo = async (token) => {
+const getDevice = async (token) => {
     try {
-      const response = await axios.get(SERVER.API_HOST+"/api/serviceIO/getDeviceInfo/" + token);
+      const response = await axios.get(SERVER.API_HOST+"/api/socketio/device/" + token);
 
       return response.data;
       /* if (response.status == 200) {
@@ -136,5 +137,5 @@ const changeState = async (token, state) => {
 
 
 
-module.exports = {sendIdSocket, enrollFingerprintEntry, enrollUser, changeState, getUserSocket, getDeviceInfo, validateDeviceToken};
+module.exports = {saveIdSocket, enrollFingerprintEntry, enrollUser, changeState, getUserSocket, getDevice, validateDeviceToken};
 

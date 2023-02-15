@@ -13,4 +13,25 @@ const getCurrentState = async(deviceToken) => {
   }
 
 
-  module.exports ={getCurrentState};
+  const changeStateRelay = async (deviceToken, state) => {
+    try{
+        
+        const response = await axios.post(SERVER.API_HOST+"/api/relayEvent/changeState", {
+            device_token: deviceToken,
+            state: state
+        });
+        //console.log("Response:" + res.data);
+        //console.log(response.data);
+        //console.log(response.status);
+        return response.data;        
+        
+    }catch(err){
+        console.error(err);
+
+    }
+    
+
+};
+
+
+  module.exports ={getCurrentState, changeStateRelay};

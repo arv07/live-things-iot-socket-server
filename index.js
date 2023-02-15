@@ -4,6 +4,7 @@ const DeviceSocket = require("./src/NodeMcu/DeviceSocketListener");
 const DRL1Socket = require("./src/devices/DRL1/DRL1SocketListener")
 const User = require("./src/User/User");
 const UserSocket = require("./src/User/UserSocketListener");
+const Device = require("./src/devices/DeviceSocketListener");
 
 //Run express module
 const express = require("express");
@@ -53,6 +54,7 @@ io.use(async (socket, next) => {
   console.log(userToken);
   console.log(deviceToken); */
   //console.log(socket.handshake.headers);
+  console.log(deviceToken);
 
   if (type == 1) {
     const result = await User.validateUserToken(userToken);
@@ -134,6 +136,7 @@ io.on("connection", async (socket) => {
 
   UserSocket.startSocketListener(socket, io);
   DRL1Socket.startSocketListener(socket, io);
+  Device.startDeviceSocketListener(socket, io);
 
   /* socket.on("USER:getSensorMode", (data) => {
         console.log(data);

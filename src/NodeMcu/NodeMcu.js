@@ -22,22 +22,19 @@ const saveIdSocket = async (id_socket, deviceToken) => {
 
 };
 
+
 ///device/fingerpintUser/create
 const enrollFingerprintEntry = async (token, userID) => {
     try{
         
-        const response = await axios.post(SERVER.API_HOST+"/api/device/fingerprintEntry/create", {
-            token: token,
+        const response = await axios.post(SERVER.API_HOST+"/api/fingeprintUser/enrollEntry", {
+            device_token: token,
             fingerprint_code: userID
         });
         //console.log("Response:" + res.data);
         //console.log(response.data);
         //console.log(response.status);
-
-        if(response.status == 201 || response.status == 200)
-        {
-            return response.data; 
-        }         
+        return response.data;        
         
     }catch(err){
         console.error(err);
@@ -58,9 +55,9 @@ const validateDeviceToken = async(deviceToken) => {
   }
 
 
-const getDevice = async (token) => {
+const getDevice = async (deviceToken) => {
     try {
-      const response = await axios.get(SERVER.API_HOST+"/api/socketio/device/" + token);
+      const response = await axios.get(SERVER.API_HOST+"/api/socketio/device/" + deviceToken);
 
       return response.data;
       /* if (response.status == 200) {
@@ -73,10 +70,10 @@ const getDevice = async (token) => {
     }
   };
 
-
-const getUserSocket = async (token) => {
+//Get user associated with the device
+const getUser = async (deviceToken) => {
     try {
-      const response = await axios.get(SERVER.API_HOST+"/api/serviceIO/getIdSocketUser/" + token);
+      const response = await axios.get(SERVER.API_HOST+"/api/socketio/device/user/" + deviceToken);
 
       return response.data;
       /* if (response.status == 200) {
@@ -137,5 +134,5 @@ const changeState = async (token, state) => {
 
 
 
-module.exports = {saveIdSocket, enrollFingerprintEntry, enrollUser, changeState, getUserSocket, getDevice, validateDeviceToken};
+module.exports = {saveIdSocket, enrollFingerprintEntry, enrollUser, changeState, getUser, getDevice, validateDeviceToken};
 

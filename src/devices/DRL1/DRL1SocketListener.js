@@ -24,14 +24,27 @@ const startSocketListener = (socket, io) => {
         })
     })
 
+    //To inform that relay was activated by movement sensor
+    socket.on("DEVICE:DRL1ActiveByMovementSensor", async (data) => {
+        const result = await NodeMcu.getUser(data.token);
+        console.log("Evento sensor movimiento --------");
+        //console.log(result);
+        await DRL1.changeStateRelay(data.token, data.state);
+        io.to(result.data.id_socket).emit("USER:DRL1ActiveByMovementSensor", {
+            state: data.state
+        })
+        
+    });
+
     socket.on("DEVICE:getCurrentStateDRL1", async (data) => {
-        const result = await DRL1.getCurrentState(data.token)
-        console.log(result);
         console.log(data);
+        /* const result = await DRL1.getCurrentState(data.token)
+        console.log(result);
+        //console.log(data);
 
         io.to(result.id_socket).emit("DEVICE:getCurrentStateDRL1_r", {
             response: result.state
-        })
+        }) */
     })
 
     socket.on("DEVICE:confirmChangeStateDRL1", async (data) => {
@@ -46,7 +59,7 @@ const startSocketListener = (socket, io) => {
 
 
     socket.on("DEVICE:currentDateDRL1", async (data) => {
-        const result = await NodeMcu.getUserSocket(data.token);
+        const result = await NodeMcu.getUser(data.token);
         console.log(data);
         io.to(result.id_socket).emit("DEVICE:currentDateDRL1_r", {
             response: data.date
@@ -64,6 +77,18 @@ const startSocketListener = (socket, io) => {
         });
         
     });
+
+
+
+
+    socket.on("DEVICE:testEvent", async (data) => {
+        //const result = await NodeMcu.getUserSocket(data.token);
+        console.log(data); 
+    });
+
+
+
+
 
     
 

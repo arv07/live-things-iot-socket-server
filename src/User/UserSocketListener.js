@@ -4,19 +4,19 @@ const startSocketListener = (socket, io) =>{
 
     socket.on("USER:getSensorMode", async (data) =>{
         //Test for first device
-        const id_device_by_user = data.idDeviceByUser;
-        const response = await User.getDeviceSocket(data.tokenUser);
+        //const id_device_by_user = data.idDevice;
+        const response = await User.getDeviceSocket(data.tokenUser, data.idDevice);
 
-        const deviceSocketId = response.filter(d => {
+        /* const deviceSocketId = response.filter(d => {
             if(d.id_device_by_user == id_device_by_user)
             {
                 return d;
             }
-        })
+        }) */
         //console.log(deviceSocketId[0].id_socket);
         /* console.log(response);
         console.log(deviceSocketId); */
-        io.to(deviceSocketId[0].id_socket).emit("DEVICE:getSensorMode", {
+        io.to(response.id_socket).emit("DEVICE:getSensorMode", {
             "response": "solicito estado pls"
         })
         //console.log(data);
@@ -28,15 +28,15 @@ const startSocketListener = (socket, io) =>{
 
     socket.on("USER:changeSensorMode", async (data) => {
 
-        const id_device_by_user = data.idDeviceByUser;
-        const response = await User.getDeviceSocket(data.tokenUser);
+        //const id_device_by_user = data.idDeviceByUser;
+        const response = await User.getDeviceSocket(data.tokenUser, data.idDevice);
 
-        const deviceSocketId = response.filter(d => {
+        /* const deviceSocketId = response.filter(d => {
             return d.id_device_by_user == id_device_by_user;
-        })
+        }) */
         //console.log(device[0].id_socket);
         //console.log(deviceIdSocket);
-        io.to(deviceSocketId[0].id_socket).emit("DEVICE:changeSensorMode", {
+        io.to(response.id_socket).emit("DEVICE:changeSensorMode", {
             "response": data.deviceMode
         })
     })
@@ -136,6 +136,37 @@ const startSocketListener = (socket, io) =>{
             "state": data.state
         })
     })
+
+
+    socket.on("USER:DeleteAllFingerprintUsers", async (data) => {
+        const response = await User.getDeviceSocket(data.tokenUser, data.idDevice);
+        console.log("EMPTY DATABASE SENSOR");    
+        console.log(response.id_socket);
+        io.to(response.id_socket).emit("DEVICE:deleteAllFingerprintUsers", {
+            "delete": data.message
+        })
+        //console.log(response);
+    });
+
+
+    socket.on("USER:resetWifiSetting", async (data) => {
+        const response = await User.getDeviceSocket(data.userToken, data.idDevice);
+        //console.log("EMPTY DATABASE SENSOR");    
+        //console.log(response.id_socket);
+        io.to(response.id_socket).emit("DEVICE:resetWifiSetting")
+        //console.log(response);
+    });
+
+
+    socket.on("USER:changeStateSensorMovement", async (data) => {
+        //console.log(data);
+        const response = await User.getDeviceSocket(data.userToken, data.idDevice);
+        io.to(response.id_socket).emit("DEVICE:changeStateSensorMovement", {
+            state: data.state
+        })
+    });
+
+    
 
     
 }

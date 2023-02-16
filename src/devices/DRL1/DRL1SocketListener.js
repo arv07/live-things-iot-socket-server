@@ -1,99 +1,77 @@
-const User = require("../../User/User");
 const DRL1 = require("./DRL1");
-const NodeMcu = require("../../NodeMcu/NodeMcu");
+const User = require("../../User/User");
 
 const startSocketListener = (socket, io) => {
+  //To inform that relay was activated by movement sensor
+  socket.on("DEVICE:DRL1ActiveByMovementSensor", async (data) => {
+    console.log("DEVICE:DRL1ActiveByMovementSensor");
+    const { userInfoAssociatedWithDevice, errorUserInfoAssociatedWithDevice } =
+      await User.getUserAssociatedWithDevice(data.token);
+    if (userInfoAssociatedWithDevice) {
+      await DRL1.changeStateRelay(data.token, data.state);
+      io.to(userInfoAssociatedWithDevice.data.data.id_socket).emit(
+        "USER:DRL1ActiveByMovementSensor",
+        {
+          state: data.state,
+        }
+      );
+    } else {
+      console.log(errorUserInfoAssociatedWithDevice);
+    }
+  });
 
-    socket.on("USER:changeStateDRL1", async (data) => {
-        //console.log(data);
-        const response = await User.getDeviceSocket(data.tokenUser, data.idDevice);
-        //console.log(response);
-        //console.log(response);
-        //console.log(data);
-        /* const deviceSocket = response.filter(d => {
-            if(d.id_device_by_user == data.idDeviceByUser)
-            {
-                return d;
-            }
-        }); */
-
-        //console.log(deviceSocket);
-
-        io.to(response.id_socket).emit("DEVICE:changeStateDRL1", {
-            response: data.state
-        })
-    })
-
-    //To inform that relay was activated by movement sensor
-    socket.on("DEVICE:DRL1ActiveByMovementSensor", async (data) => {
-        const result = await NodeMcu.getUser(data.token);
-        console.log("Evento sensor movimiento --------");
-        //console.log(result);
-        await DRL1.changeStateRelay(data.token, data.state);
-        io.to(result.data.id_socket).emit("USER:DRL1ActiveByMovementSensor", {
-            state: data.state
-        })
-        
-    });
-
-    socket.on("DEVICE:getCurrentStateDRL1", async (data) => {
-        console.log(data);
-        /* const result = await DRL1.getCurrentState(data.token)
-        console.log(result);
+  socket.on("DEVICE:getCurrentStateDRL1", async (data) => {
+    //console.log(data);
+    /* const userInfoAssociatedWithDevice = await DRL1.getCurrentState(data.token)
+        console.log(userInfoAssociatedWithDevice);
         //console.log(data);
 
-        io.to(result.id_socket).emit("DEVICE:getCurrentStateDRL1_r", {
-            response: result.state
+        io.to(userInfoAssociatedWithDevice.id_socket).emit("DEVICE:getCurrentStateDRL1_r", {
+            response: userInfoAssociatedWithDevice.state
         }) */
-    })
+  });
 
-    socket.on("DEVICE:confirmChangeStateDRL1", async (data) => {
-        console.log(data);
-        /* const result = await NodeMcu.getUserSocket(data.token);
+  socket.on("DEVICE:confirmChangeStateDRL1", async (data) => {
+    //console.log(data);
+    /* const userInfoAssociatedWithDevice = await NodeMcu.getUserSocket(data.token);
 
-        io.to(result.id_socket).emit("DEVICE:confirmChangeStateDRL1_r", {
+        io.to(userInfoAssociatedWithDevice.id_socket).emit("DEVICE:confirmChangeStateDRL1_r", {
             response: data.message
         })
-        console.log(result); */
-    });
+        console.log(userInfoAssociatedWithDevice); */
+  });
 
+  socket.on("DEVICE:currentDateDRL1", async (data) => {
+    const { userInfoAssociatedWithDevice, errorUserInfoAssociatedWithDevice } =
+      await User.getUserAssociatedWithDevice(data.token);
+    console.log(data);
+    if (userInfoAssociatedWithDevice) {
+      io.to(userInfoAssociatedWithDevice.data.data.id_socket).emit(
+        "DEVICE:currentDateDRL1_r",
+        {
+          response: data.date,
+        }
+      );
+    } else {
+      console.log(errorUserInfoAssociatedWithDevice);
+    }
+  });
 
-    socket.on("DEVICE:currentDateDRL1", async (data) => {
-        const result = await NodeMcu.getUser(data.token);
-        console.log(data);
-        io.to(result.id_socket).emit("DEVICE:currentDateDRL1_r", {
-            response: data.date
-        })
-        
-    });
-
-
-    socket.on("DEVICE:setDeviceScheduler_r", async (data) => {
-        const result = await NodeMcu.getUserSocket(data.token);
-        console.log(data);
-
-        io.to(result.id_socket).emit("USER:setDeviceScheduler_r", {
-            response: data.message
-        });
-        
-    });
-
-
-
-
-    socket.on("DEVICE:testEvent", async (data) => {
-        //const result = await NodeMcu.getUserSocket(data.token);
-        console.log(data); 
-    });
-
-
-
-
-
-    
-
-
-
-}
+  socket.on("DEVICE:setDeviceScheduler_r", async (data) => {
+    const { userInfoAssociatedWithDevice, errorUserInfoAssociatedWithDevice } =
+      await User.getUserAssociatedWithDevice(data.token);
+    console.log(data);
+    if (userInfoAssociatedWithDevice) {
+      io.to(userInfoAssociatedWithDevice.data.data.id_socket).emit(
+        "USER:setDeviceScheduler_r",
+        {
+          response: data.message,
+        }
+      );
+    } else {
+      console.log(errorUserInfoAssociatedWithDevice);
+    }
+  });
+};
 
 module.exports = { startSocketListener };

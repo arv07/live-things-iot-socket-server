@@ -20,9 +20,6 @@ const getCurrentState = async(deviceToken) => {
             device_token: deviceToken,
             state: state
         });
-        //console.log("Response:" + res.data);
-        //console.log(response.data);
-        //console.log(response.status);
         return response.data;        
         
     }catch(err){

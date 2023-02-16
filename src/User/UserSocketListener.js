@@ -149,24 +149,8 @@ const startSocketListener = (socket, io) =>{
     });
 
 
-    socket.on("USER:resetWifiSetting", async (data) => {
-        const response = await User.getDeviceSocket(data.userToken, data.idDevice);
-        //console.log("EMPTY DATABASE SENSOR");    
-        //console.log(response.id_socket);
-        io.to(response.id_socket).emit("DEVICE:resetWifiSetting")
-        //console.log(response);
-    });
-
-
-    socket.on("USER:changeStateSensorMovement", async (data) => {
-        //console.log(data);
-        const response = await User.getDeviceSocket(data.userToken, data.idDevice);
-        io.to(response.id_socket).emit("DEVICE:changeStateSensorMovement", {
-            state: data.state
-        })
-    });
-
     
+
 
     
 }

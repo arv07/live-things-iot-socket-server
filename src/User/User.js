@@ -1,9 +1,5 @@
 const axios = require("axios");
 const SERVER = require('../utils/constants')
-const Device = require('../NodeMcu/NodeMcu');
-const { response } = require("express");
-
-
 
 const saveIdSocket = async (id_socket, token) => {
   try {
@@ -11,9 +7,6 @@ const saveIdSocket = async (id_socket, token) => {
       id_socket: id_socket,
       user_token: token
     });
-    //console.log(res);
-    //console.log("method:" + res.data);
-    //console.log("parameter" + token);
   } catch (err) {
     console.error(err);
   }
@@ -29,48 +22,35 @@ const validateUserToken = async(userToken) => {
   }
 }
 
-const getUserToken = async(deviceToken) => {
-  try {
-    const result = await axios.get(SERVER.API_HOST+"/api/user/getUserToken/"+deviceToken);
-    //console.log(result.data);
-    return result.data;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 const getSocketRoom = async(userToken) => {
   try {
     const result = await axios.get(SERVER.API_HOST+"/api/user/socket/socketRoom/"+userToken);
-    //console.log(result.data);
     return result.data;
   } catch (error) {
     console.log(error);
   }
 }
 
-
-
-
-const getDeviceSocket = async (userToken, idDevice) => {
+const getUser = async (userToken) => {
   try {
-
-    const response = await axios.get(SERVER.API_HOST+"/api/socketio/user/device/"+userToken+"/"+idDevice);
-    //console.log(response.data);
-    return response.data;
-    
-    
-  } catch (error) {
-    console.log(error);
+    const userInfo = await axios.get(SERVER.API_HOST+"/api/socketio/user/"+userToken);
+    return {userInfo};
+  } catch (errorUserInfo) {
+    return {errorUserInfo}
   }
 }
 
-const testSocket = (socket) => {
 
-  socket.on("USER:getSensorMode", (data) => {
-        console.log(data);
-    })
+//Get user associated with the device
+const getUserAssociatedWithDevice = async (deviceToken) => {
+  try {
+    const userInfoAssociatedWithDevice = await axios.get(
+      SERVER.API_HOST + "/api/socketio/device/user/" + deviceToken
+    );
+    return { userInfoAssociatedWithDevice };
+  } catch (errorUserInfoAssociatedWithDevice) {
+    return { errorUserInfoAssociatedWithDevice };
+  }
+};
 
-}
-
-module.exports = { saveIdSocket, testSocket, getDeviceSocket, validateUserToken, getSocketRoom, getUserToken };
+module.exports = { saveIdSocket,  validateUserToken, getSocketRoom, getUserAssociatedWithDevice, getUser };
